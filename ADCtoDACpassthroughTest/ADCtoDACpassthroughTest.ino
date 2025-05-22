@@ -7,21 +7,30 @@ float vrefDAC = 2.048;
 const float ADCtoDACconversion1 = (vddADC/1024) * (4096/vrefDAC); //pure voltage conversion: 1v ADC to 1v DAC
 const float ADCtoDACconversion2 = 4096 / 1024; // percentage conversion: 50% of vdd ADC voltage to 50% of vref DAC voltage
 
+//pins
+const int ADC_CS = 10;  // Chip select for MCP3002 ADC
+const int DAC_CS = 9;   // Chip select for MCP4821 DAC
+
+//timing
+unsigned long timeNow = micros();
+unsigned long timeLast = micros();
+unsigned long samplingPeriod = 63;
+
 //speed tests
+uint16_t sig = 2000;
+/*
 const int iterations = 10000;
-unsigned long timeNow;
-unsigned long timeLast;
 unsigned long adc[iterations];
 unsigned long convert[iterations];
 unsigned long dac[iterations];
-
+*/
 
 void setup() {
   // Initialize SPI
   SPI.begin();
   
   // Set the SPI settings (Clock speed, bit order, data mode)
-  SPI.beginTransaction(SPISettings(16000000, MSBFIRST, SPI_MODE0));
+  SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
 
   // Set chip select pins as outputs
   pinMode(ADC_CS, OUTPUT);
@@ -32,11 +41,12 @@ void setup() {
   digitalWrite(DAC_CS, HIGH);
 
   // Initialize Serial Monitor
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial);
-
-
   
+  
+
+  /*
   //timing tests:
   //run 10000 samples through the system and record times
   timeLast = micros();
@@ -84,16 +94,51 @@ void setup() {
   Serial.println(dacAv);
   Serial.print("Total time for 10000 DAC writes:");
   Serial.println(dacSum);
-  
+  */
   
 
 }
 
 void loop() {
-  /*
-  // Read data from MCP3002 (ADC)
-  uint16_t adcValue = readADC();
+  
+  timeNow = micros();
+  if ((timeNow-timeLast)>= samplingPeriod){
+    //square wave
+    /*
+    if (sig == 2000){
+      writeDAC(2000);
+      sig = 1000;
+    }
+    else{
+      writeDAC(1000);
+      sig = 2000;
+    }
+    */
+    //uint16_t adcValue = readADC();       // 10-bit value (0–1023)
+    //float voltage = (adcValue / 1023.0) * 3.3;  // Convert ADC reading to volts (assuming 3.3 V Vref)
+    //uint16_t dacValue = (voltage / 4.096) * 4095;  // Convert to DAC value assuming gain = 1
+    
+    
+    uint16_t adcValue = readADC();
+    Serial.println(adcValue);
+    delayMicroseconds(10);
+    writeDAC(adcValue);
+    //Serial.println(adcValue);
+    //uint16_t dacValue = adcValue*ADCtoDACconversion1;
+    //writeDAC(dacValue);
+    
+    timeLast = timeNow;
+  }
 
+  
+
+
+  
+  // Read data from MCP3002 (ADC)
+  //uint16_t adcValue = readADC();
+  //Serial.println(adcValue);
+  //writeDAC(2000);
+  /*
   // Print the ADC value for monitoring
   Serial.print("ADC Value: ");
   Serial.println(adcValue);
@@ -107,9 +152,49 @@ void loop() {
   writeDAC(dacValue);
   */
 
-  delay(300); // Delay for stability
+  //delay(1000); // Delay for stability
 }
 
+
+  // Reads from MCP3002 channel 0 (single-ended mode)
+uint16_t readADC() {
+  digitalWrite(ADC_CS, LOW);
+
+  // MCP3002 control bits:
+  // Start bit = 1
+  // SGL/DIFF = 1 (single-ended)
+  // ODD/SIGN = 0 (channel 0)
+  byte command = 0b11010000; // Start + single-ended, CH0
+
+  byte highByte = SPI.transfer(command);
+  byte lowByte = SPI.transfer(0x00);
+
+  digitalWrite(ADC_CS, HIGH);
+
+  // Combine to 10-bit result (discard null bit)
+  uint16_t result = ((highByte & 0x03) << 8) | lowByte;
+  return result;
+}
+
+// Writes a 12-bit value to MCP4821 DAC
+void writeDAC(uint16_t value) {
+  value &= 0x0FFF;  // Ensure 12-bit range
+
+  // Control bits:
+  // 0b0011 = Write, Unbuffered, Gain 1x, Active
+  uint16_t command = (0b0011 << 12) | value;
+
+  byte highByte = (command >> 8) & 0xFF;
+  byte lowByte = command & 0xFF;
+
+  digitalWrite(DAC_CS, LOW);
+  SPI.transfer(highByte);
+  SPI.transfer(lowByte);
+  digitalWrite(DAC_CS, HIGH);
+}
+
+
+/*
 // Function to read the ADC (MCP3002)
 uint16_t readADC() {
   digitalWrite(ADC_CS, LOW);  // Activate the ADC
@@ -121,7 +206,7 @@ uint16_t readADC() {
   digitalWrite(ADC_CS, HIGH);  // Deactivate the ADC
 
   // Combine the two bytes (10-bit result)
-  uint16_t result = ((highByte & 0x03) << 8) | lowByte;  // Mask and combine
+  uint16_t result = ((highByte & 0xFF) << 8) | lowByte;  // Mask and combine
   return result;
 }
 
@@ -145,3 +230,4 @@ void writeDAC(uint16_t value) {
   SPI.transfer(lowByte);
   digitalWrite(DAC_CS, HIGH);
 }
+*/
