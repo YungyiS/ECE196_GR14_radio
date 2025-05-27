@@ -24,11 +24,11 @@ class NRF24ChatApp:
         self.chat_log_label.pack(pady=(10, 0))
 
         # Chat display
-        self.chat_display = scrolledtext.ScrolledText(master, width=50, height=20, state='normal')
+        self.chat_display = scrolledtext.ScrolledText(master, width=70, height=30, state='normal')
         self.chat_display.pack(padx=10, pady=(0, 10))
 
         # Message entry
-        self.message_entry = tk.Entry(master, width=40, fg='grey')
+        self.message_entry = tk.Entry(master, width=60, fg='grey')
         self.message_entry.pack(side=tk.LEFT, padx=(10, 5), pady=(0, 10))
         self.message_entry.insert(0, self.PLACEHOLDER)
         self.message_entry.bind("<FocusIn>", self.clear_placeholder)
@@ -58,6 +58,7 @@ class NRF24ChatApp:
                     self.status_label.config(text=f"Connected to {port.device}", fg="green")
                     self.reader_thread = threading.Thread(target=self.read_serial, daemon=True)
                     self.reader_thread.start()
+                    self.chat_display.insert(tk.END, f"***Connected to device. You will see messages appear in this box***")
                     return
                 except Exception as e:
                     messagebox.showerror("Auto-Connect Error", f"Failed to connect to {port.device}: {e}")
@@ -143,7 +144,7 @@ class NRF24ChatApp:
                 #self.serial_conn.write((chunk + '\n').encode('utf-8'))
                 time.sleep(0.05)  # small delay to allow NRF24 to process
             #self.serial_conn.write(('\n').encode('utf-8'))
-            self.chat_display.insert(tk.END, f"YOU: {msg}\n")
+            self.chat_display.insert(tk.END, f"\nYOU: {msg}\n")
             self.chat_display.see(tk.END)
             self.message_entry.delete(0, tk.END)
         except Exception as e:
