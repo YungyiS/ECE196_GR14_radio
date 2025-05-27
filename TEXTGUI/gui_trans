@@ -126,7 +126,7 @@ class NRF24ChatApp:
         if not self.serial_conn or not self.serial_conn.is_open:
             messagebox.showerror("Connection Error", "Serial connection not available.")
             return
-        chunk_size = 32
+        chunk_size = 31
         msg = self.message_entry.get().strip()
         if not msg:
             messagebox.showwarning("Empty Input", "Please enter some text to send.")
@@ -157,10 +157,10 @@ class NRF24ChatApp:
                     line = self.serial_conn.readline().decode('utf-8').strip()
                     if line:
                         if line[0] == '`':
-                            self.chat_display.insert(tk.end,f"{line[1:len(line)]}\n")
-                            self.chat_display.see(tk.end)
+                            self.chat_display.insert(tk.END,f"{line[1:len(line)]}")
+                            self.chat_display.see(tk.END)
                         else:
-                            self.chat_display.insert(tk.END, f"FRIEND: {line}\n")
+                            self.chat_display.insert(tk.END, f"\nFRIEND: {line}")
                             self.chat_display.see(tk.END)
                             self.flash_chat_display()
             except Exception:
