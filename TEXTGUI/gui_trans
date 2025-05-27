@@ -144,7 +144,7 @@ class NRF24ChatApp:
                 #self.serial_conn.write((chunk + '\n').encode('utf-8'))
                 time.sleep(0.05)  # small delay to allow NRF24 to process
             #self.serial_conn.write(('\n').encode('utf-8'))
-            self.chat_display.insert(tk.END, f"\nYOU: {msg}\n")
+            self.chat_display.insert(tk.END, f"\nYOU: {msg}")
             self.chat_display.see(tk.END)
             self.message_entry.delete(0, tk.END)
         except Exception as e:
