@@ -8,23 +8,24 @@ import time
 BAUD_RATE = 115200
 SERIAL_TIMEOUT = 0.1
 TEENSY_VIDPID = "16C0:0483"  #Serial connection port for the teensy 4.0
-
+DARK_GRAY = "#2e2e2e"
 
 
 class NRF24ChatApp:
     def __init__(self, master):
         self.master = master
-        master.title("NRF24 Chat GUI")
+        master.title("NRF24 ENCRYPTED Chat GUI")
+        master.configure(bg=DARK_GRAY)
         self.serial_conn = None
         self.running = True
         self.popup_open = False
         self.PLACEHOLDER = "Type your message here..."
         # Chat log label
-        self.chat_log_label = tk.Label(master, text="Chat Log", font=("Helvetica", 12, "bold"))
+        self.chat_log_label = tk.Label(master, text="Chat Log", font=("Arial", 12, "bold"),bg= DARK_GRAY,fg="white")
         self.chat_log_label.pack(pady=(10, 0))
 
         # Chat display
-        self.chat_display = scrolledtext.ScrolledText(master, width=70, height=30, state='normal')
+        self.chat_display = scrolledtext.ScrolledText(master, width=70, height=30, state='normal',bg="lightgray")
         self.chat_display.pack(padx=10, pady=(0, 10))
 
         # Message entry
@@ -55,7 +56,7 @@ class NRF24ChatApp:
             if TEENSY_VIDPID in port.hwid.upper():
                 try:
                     self.serial_conn = serial.Serial(port.device, BAUD_RATE, timeout=SERIAL_TIMEOUT)
-                    self.status_label.config(text=f"Connected to {port.device}", fg="green")
+                    self.status_label.config(text=f"Connected to {port.device}", fg="green",bg = DARK_GRAY)
                     self.reader_thread = threading.Thread(target=self.read_serial, daemon=True)
                     self.reader_thread.start()
                     self.chat_display.insert(tk.END, f"***Connected to device. You will see messages appear in this box***")
@@ -63,7 +64,7 @@ class NRF24ChatApp:
                 except Exception as e:
                     messagebox.showerror("Auto-Connect Error", f"Failed to connect to {port.device}: {e}")
                     return
-        self.status_label.config(text="Auto-connect failed", fg="orange")
+        self.status_label.config(text="Auto-connect failed", fg="orange",bg = DARK_GRAY)
         self.show_manual_connect_popup()
 
     def show_manual_connect_popup(self):
@@ -170,7 +171,7 @@ class NRF24ChatApp:
 
     def flash_chat_display(self):
         original_color = self.chat_display.cget("background")
-        self.chat_display.config(background="#ccffd0")  # green
+        self.chat_display.config(background="#3cc911")  # green
         self.master.after(300, lambda: self.chat_display.config(background=original_color))
 
     def monitor_connection(self):
