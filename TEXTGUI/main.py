@@ -145,7 +145,7 @@ class NRF24ChatApp:
                 #self.serial_conn.write((chunk + '\n').encode('utf-8'))
                 time.sleep(0.05)  # small delay to allow NRF24 to process
             #self.serial_conn.write(('\n').encode('utf-8'))
-            self.chat_display.insert(tk.END, f"\nYOU: {msg}")
+            #self.chat_display.insert(tk.END, f"\nYOU: {msg}")
             self.chat_display.see(tk.END)
             self.message_entry.delete(0, tk.END)
         except Exception as e:
@@ -168,6 +168,24 @@ class NRF24ChatApp:
             except Exception:
                 pass
             time.sleep(0.1)
+
+    def add_chat_bubble(self, sender, message, side='left', color="#4a4a4a"):
+        bubble_frame = tk.Frame(self.chat_frame, bg=DARK_GRAY)
+        bubble_label = tk.Label(
+            bubble_frame,
+            text=message,
+            wraplength=300,
+            bg=color,
+            fg="white",
+            justify=tk.LEFT if side == 'left' else tk.RIGHT,
+            padx=10,
+            pady=5
+        )
+        bubble_label.pack(anchor=side, padx=10, pady=2)
+        bubble_frame.pack(anchor=side, fill=tk.X)
+
+        # Auto-scroll to bottom
+        self.master.after(100, lambda: self.canvas.yview_moveto(1.0))
 
     def flash_chat_display(self):
         original_color = self.chat_display.cget("background")
