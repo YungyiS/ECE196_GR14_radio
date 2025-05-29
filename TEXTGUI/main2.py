@@ -167,7 +167,7 @@ class NRF24ChatApp:
         if not self.serial_conn or not self.serial_conn.is_open:
             messagebox.showerror("Connection Error", "Serial connection not available.")
             return
-        chunk_size = 31
+        chunk_size = 30
         msg = self.message_entry.get().strip()
         num_chunks = (len(msg) + chunk_size - 1) // chunk_size
         if not msg:
@@ -180,6 +180,7 @@ class NRF24ChatApp:
                 else:
                     chunk = msg[i:i + chunk_size]
                     self.serial_conn.write(('`' + chunk + '\0').encode('utf-8'))
+                    
 
                 #self.serial_conn.write((chunk + '\n').encode('utf-8'))
                 time.sleep(0.05)  # small delay to allow NRF24 to process
