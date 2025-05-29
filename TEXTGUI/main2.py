@@ -26,7 +26,7 @@ class NRF24ChatApp:
         self.chat_log_label.grid(row=0, column=0, columnspan=2, pady=(10, 0), sticky="w")
 
         # Chat display frame (with canvas + scrollbar)
-        self.canvas = tk.Canvas(master, width=550, height=400, bg=DARK_GRAY, highlightthickness=0)
+        self.canvas = tk.Canvas(master, width=400, height=400, bg=DARK_GRAY, highlightthickness=0)
         self.scrollbar = ttk.Scrollbar(master, orient="vertical", command=self.canvas.yview)
         self.chat_frame = tk.Frame(self.canvas, bg=DARK_GRAY)
 
