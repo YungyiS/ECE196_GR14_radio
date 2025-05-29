@@ -4,12 +4,12 @@
 
 RF24 radio(0, 1); // CE, CSN
 
-const byte txAddr[6] = "NodeA";  // Send to Node B
-const byte rxAddr[6] = "NodeB";  // Listen as Node A
+//const byte txAddr[6] = "NodeA";  // Send to Node B
+//const byte rxAddr[6] = "NodeB";  // Listen as Node A
 
 // USE FOR OTHER TEENSY
-//const byte txAddr[6] = "NodeB";  // Send to Node A
-//const byte rxAddr[6] = "NodeA";  // Listen as Node B
+const byte txAddr[6] = "NodeB";  // Send to Node A
+const byte rxAddr[6] = "NodeA";  // Listen as Node B
 
 void setup() {
   Serial.begin(115200);
@@ -22,11 +22,9 @@ void setup() {
   radio.setRetries(3, 5);
   radio.enableDynamicPayloads();
   radio.setAutoAck(true);
-
   radio.openWritingPipe(txAddr);
   radio.openReadingPipe(1, rxAddr);
   radio.startListening();
-
 }
 
 char buffer[32];
