@@ -33,7 +33,7 @@ void loop() {
   // Send from Serial to RF
   if (Serial.available()) {
     radio.stopListening();
-    String msg = Serial.readStringUntil('\n');
+    String msg = Serial.readStringUntil('\0');
     if(msg)
     radio.openWritingPipe(txAddr);
     radio.write(msg.c_str(), msg.length() + 1);

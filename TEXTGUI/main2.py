@@ -176,16 +176,16 @@ class NRF24ChatApp:
         try:
             for i in range(0, len(msg), chunk_size):
                 if num_chunks == 1:
-                    self.serial_conn.write((msg + '\n').encode('utf-8'))
+                    self.serial_conn.write((msg + '\0').encode('utf-8'))
                 else:
                     chunk = msg[i:i + chunk_size]
-                    self.serial_conn.write(('`' + chunk + '\n').encode('utf-8'))
+                    self.serial_conn.write(('`' + chunk + '\0').encode('utf-8'))
 
                 #self.serial_conn.write((chunk + '\n').encode('utf-8'))
                 time.sleep(0.05)  # small delay to allow NRF24 to process
             #self.serial_conn.write(('\n').encode('utf-8'))
             if num_chunks > 1:
-                self.serial_conn.write(('``' + '\n').encode('utf-8'))
+                self.serial_conn.write(('``' + '\0').encode('utf-8'))
             self.message_entry.delete(0, tk.END)
             self.add_chat_bubble("You", msg, side="right", color=YOU_COLOR)
         except Exception as e:
